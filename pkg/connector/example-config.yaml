@@ -1,0 +1,9 @@
+# Displayname template for Pylon users.
+#  .Alias - The alias set by me.
+#  .Name - The username set by the user.
+#  .ID - The internal user ID of the user.
+displayname_template: '{{or .Alias .Name .ID}}'
+
+onebot:
+  endpoint: "127.0.0.1:23457"
+  request_timeout: 60s
