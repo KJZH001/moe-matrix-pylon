@@ -138,7 +138,7 @@ func (pc *PylonClient) getGroupChatInfo(_ context.Context, portal *bridgev2.Port
 	}
 
 	for _, m := range membersInfo {
-		evtSender := pc.makeEventSender(fmt.Sprint(m.UserID))
+		evtSender := pc.makeEventSender(m.UserID)
 		pl := powerDefault
 		if m.Role == "owner" {
 			pl = powerSuperAdmin
@@ -164,7 +164,7 @@ func (pc *PylonClient) contactToUserInfo(contact *onebot.UserInfo) *bridgev2.Use
 		Name: ptr.Ptr(pc.main.Config.FormatDisplayname(DisplaynameParams{
 			Alias: contact.Remark,
 			Name:  contact.Nickname,
-			ID:    fmt.Sprint(contact.ID),
+			ID:    contact.ID,
 		})),
 		Avatar: wrapAvatar(util.GetUserAvatarURL(contact.ID)),
 	}
@@ -316,7 +316,7 @@ func (pc *PylonClient) updateMemberDisplyname(ctx context.Context, portal *bridg
 	_, peerID := ids.ParsePortalID(portal.ID)
 	if members, err := pc.client.GetGroupMemberList(peerID); err == nil {
 		for _, member := range members {
-			memberIntent := portal.GetIntentFor(ctx, pc.makeEventSender(fmt.Sprint(member.UserID)), pc.userLogin, bridgev2.RemoteEventChatInfoChange)
+			memberIntent := portal.GetIntentFor(ctx, pc.makeEventSender(member.UserID), pc.userLogin, bridgev2.RemoteEventChatInfoChange)
 
 			mxid := memberIntent.GetMXID()
 

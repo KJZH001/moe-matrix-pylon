@@ -37,11 +37,11 @@ func (pc *PylonClient) handleOnebotEvent(evt onebot.IEvent) {
 		pc.main.Bridge.QueueRemoteEvent(pc.userLogin, &OnebotMessageEvent{
 			message: &onebot.Message{
 				MessageType: "private",
-				MessageID:   int32(friendRecall.MessageID),
+				MessageID:   friendRecall.MessageID,
 				Sender:      onebot.Sender{UserID: friendRecall.UserID},
 				Event:       onebot.Event{Time: friendRecall.Time},
 				Message: []onebot.ISegment{
-					onebot.NewReply(fmt.Sprint(friendRecall.MessageID)),
+					onebot.NewReply(friendRecall.MessageID),
 					onebot.NewText("[revoke]"),
 				},
 			},
@@ -54,12 +54,12 @@ func (pc *PylonClient) handleOnebotEvent(evt onebot.IEvent) {
 		pc.main.Bridge.QueueRemoteEvent(pc.userLogin, &OnebotMessageEvent{
 			message: &onebot.Message{
 				MessageType: "group",
-				MessageID:   int32(groupRecall.MessageID),
+				MessageID:   groupRecall.MessageID,
 				GroupID:     groupRecall.GroupID,
 				Sender:      onebot.Sender{UserID: groupRecall.UserID},
 				Event:       onebot.Event{Time: groupRecall.Time},
 				Message: []onebot.ISegment{
-					onebot.NewReply(fmt.Sprint(groupRecall.MessageID)),
+					onebot.NewReply(groupRecall.MessageID),
 					onebot.NewText("[revoke]"),
 				},
 			},
@@ -91,7 +91,7 @@ func (evt *OnebotMessageEvent) ShouldCreatePortal() bool {
 }
 
 func (evt *OnebotMessageEvent) AddLogContext(c zerolog.Context) zerolog.Context {
-	return c.Int32("message_id", evt.message.MessageID).Int64("sender_id", evt.message.Sender.UserID)
+	return c.Str("message_id", evt.message.MessageID).Str("sender_id", evt.message.Sender.UserID)
 }
 
 func (evt *OnebotMessageEvent) GetPortalKey() networkid.PortalKey {
@@ -103,15 +103,15 @@ func (evt *OnebotMessageEvent) GetPortalKey() networkid.PortalKey {
 }
 
 func (evt *OnebotMessageEvent) GetSender() bridgev2.EventSender {
-	return evt.pc.makeEventSender(fmt.Sprint(evt.message.Sender.UserID))
+	return evt.pc.makeEventSender(evt.message.Sender.UserID)
 }
 
 func (evt *OnebotMessageEvent) GetID() networkid.MessageID {
 	peerID := ids.GetPeerID(evt.message)
 	if evt.isFake {
-		return ids.MakeFakeMessageID(peerID, fmt.Sprintf("fake-%d", evt.message.MessageID))
+		return ids.MakeFakeMessageID(peerID, fmt.Sprintf("fake-%s", evt.message.MessageID))
 	}
-	return ids.MakeMessageID(peerID, fmt.Sprint(evt.message.MessageID))
+	return ids.MakeMessageID(peerID, evt.message.MessageID)
 }
 
 func (evt *OnebotMessageEvent) GetTimestamp() time.Time {
@@ -124,7 +124,7 @@ func (evt *OnebotMessageEvent) GetType() bridgev2.RemoteEventType {
 }
 
 func (evt *OnebotMessageEvent) GetTargetMessage() networkid.MessageID {
-	return ids.MakeMessageID(ids.GetPeerID(evt.message), fmt.Sprint(evt.message.MessageID))
+	return ids.MakeMessageID(ids.GetPeerID(evt.message), evt.message.MessageID)
 }
 
 func (evt *OnebotMessageEvent) GetChatInfo(ctx context.Context, portal *bridgev2.Portal) (*bridgev2.ChatInfo, error) {

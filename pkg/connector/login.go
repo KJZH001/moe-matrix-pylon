@@ -95,7 +95,7 @@ func (tl *TokenLogin) Wait(ctx context.Context) (*bridgev2.LoginStep, error) {
 					tl.client.Release()
 
 					ul, err := tl.user.NewLogin(ctx, &database.UserLogin{
-						ID:         ids.MakeUserLoginID(fmt.Sprint(info.ID)),
+						ID:         ids.MakeUserLoginID(info.ID),
 						RemoteName: info.Nickname,
 						Metadata:   &UserLoginMetadata{Token: tl.client.GetToken()},
 					}, &bridgev2.NewLoginParams{

@@ -3,7 +3,6 @@ package connector
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/duo/matrix-pylon/pkg/ids"
@@ -33,15 +32,14 @@ func (pc *PylonClient) HandleMatrixMessage(ctx context.Context, msg *bridgev2.Ma
 	}
 
 	peerType, peerID := ids.ParsePortalID(msg.Portal.ID)
-	target, _ := strconv.ParseInt(peerID, 10, 64)
 
 	var resp *onebot.SendMessageResponse
 
 	switch peerType {
 	case ids.PeerTypeUser:
-		resp, err = pc.client.SendPrivateMessage(target, segments)
+		resp, err = pc.client.SendPrivateMessage(peerID, segments)
 	case ids.PeerTypeGroup:
-		resp, err = pc.client.SendGroupMessage(target, segments)
+		resp, err = pc.client.SendGroupMessage(peerID, segments)
 	default:
 		return nil, fmt.Errorf("unsupported chat type %s", peerType)
 	}
@@ -52,7 +50,7 @@ func (pc *PylonClient) HandleMatrixMessage(ctx context.Context, msg *bridgev2.Ma
 		_, peerID := ids.ParsePortalID(msg.Portal.ID)
 		return &bridgev2.MatrixMessageResponse{
 			DB: &database.Message{
-				ID:        ids.MakeMessageID(peerID, fmt.Sprint(resp.MessageID)),
+				ID:        ids.MakeMessageID(peerID, resp.MessageID),
 				SenderID:  networkid.UserID(pc.userLogin.ID),
 				Timestamp: time.Now(),
 			},
@@ -68,7 +66,5 @@ func (pc *PylonClient) HandleMatrixMessageRemove(ctx context.Context, msg *bridg
 		return err
 	}
 
-	id, _ := strconv.ParseInt(messageID, 10, 32)
-
-	return pc.client.DeleteMessage(int32(id))
+	return pc.client.DeleteMessage(messageID)
 }

@@ -94,7 +94,7 @@ func NewGetLoginInfoRequest() *Request {
 	return &Request{Action: string(GetLoginInfo)}
 }
 
-func NewGetUserInfoRequest(userID int64) *Request {
+func NewGetUserInfoRequest(userID string) *Request {
 	return &Request{
 		Action: string(GetStrangerInfo),
 		Params: map[string]interface{}{
@@ -103,7 +103,7 @@ func NewGetUserInfoRequest(userID int64) *Request {
 	}
 }
 
-func NewGetGroupInfoRequest(groupID int64) *Request {
+func NewGetGroupInfoRequest(groupID string) *Request {
 	return &Request{
 		Action: string(GetGroupInfo),
 		Params: map[string]interface{}{
@@ -120,7 +120,7 @@ func NewGetGroupListRequest() *Request {
 	return &Request{Action: string(GetGroupList)}
 }
 
-func NewGetGroupMemberListRequest(groupID int64) *Request {
+func NewGetGroupMemberListRequest(groupID string) *Request {
 	return &Request{
 		Action: string(GetGroupMemberList),
 		Params: map[string]interface{}{
@@ -129,7 +129,7 @@ func NewGetGroupMemberListRequest(groupID int64) *Request {
 	}
 }
 
-func NewGetGroupMemberInfoRequest(groupID, userID int64) *Request {
+func NewGetGroupMemberInfoRequest(groupID, userID string) *Request {
 	return &Request{
 		Action: string(GetGroupMemberInfo),
 		Params: map[string]interface{}{
@@ -176,7 +176,7 @@ func NewGetForwardMsgRequest(msgID string) *Request {
 	}
 }
 
-func NewPrivateMsgRequest(userID int64, segments []ISegment) *Request {
+func NewPrivateMsgRequest(userID string, segments []ISegment) *Request {
 	return &Request{
 		Action: string(SendMsg),
 		Params: map[string]interface{}{
@@ -187,7 +187,7 @@ func NewPrivateMsgRequest(userID int64, segments []ISegment) *Request {
 	}
 }
 
-func NewGroupMsgRequest(groupID int64, segments []ISegment) *Request {
+func NewGroupMsgRequest(groupID string, segments []ISegment) *Request {
 	return &Request{
 		Action: string(SendMsg),
 		Params: map[string]interface{}{
@@ -198,7 +198,7 @@ func NewGroupMsgRequest(groupID int64, segments []ISegment) *Request {
 	}
 }
 
-func NewDeleteMsgRequest(messageID int32) *Request {
+func NewDeleteMsgRequest(messageID string) *Request {
 	return &Request{
 		Action: string(DeleteMsg),
 		Params: map[string]interface{}{
@@ -219,19 +219,19 @@ func (r *Response) PayloadType() PayloadType {
 }
 
 type UserInfo struct {
-	ID       int64  `json:"user_id" mapstructure:"user_id"`
+	ID       string `json:"user_id" mapstructure:"user_id"`
 	Nickname string `json:"nickname,omitempty" mapstructure:"nickname,omitempty"`
 	Remark   string `json:"remark,omitempty" mapstructure:"remark,omitempty"`
 }
 
 type GroupInfo struct {
-	ID   int64  `json:"group_id" mapstructure:"group_id"`
+	ID   string `json:"group_id" mapstructure:"group_id"`
 	Name string `json:"group_name,omitempty" mapstructure:"group_name,omitempty"`
 }
 
 type MemberInfo struct {
-	UserID   int64  `json:"user_id" mapstructure:"user_id"`
-	GroupID  int64  `json:"group_id" mapstructure:"group_id"`
+	UserID   string `json:"user_id" mapstructure:"user_id"`
+	GroupID  string `json:"group_id" mapstructure:"group_id"`
 	Nickname string `json:"nickname,omitempty" mapstructure:"nickname,omitempty"`
 	Card     string `json:"card,omitempty" mapstructure:"card,omitempty"`
 	Role     string `json:"role,omitempty" mapstructure:"role,omitempty"`
@@ -247,7 +247,7 @@ type FileInfo struct {
 }
 
 type SendMessageResponse struct {
-	MessageID int32 `json:"message_id" mapstructure:"message_id"`
+	MessageID string `json:"message_id" mapstructure:"message_id"`
 }
 
 type EventType string
@@ -286,7 +286,7 @@ type IEvent interface {
 
 type Event struct {
 	Time     int64  `json:"time" mapstructure:"time"`
-	SelfID   int64  `json:"self_id" mapstructure:"self_id"`
+	SelfID   string `json:"self_id" mapstructure:"self_id"`
 	PostType string `json:"post_type" mapstructure:"post_type"`
 }
 
@@ -302,10 +302,10 @@ type Message struct {
 	Event       `mapstructure:",squash"`
 	MessageType string    `json:"message_type" mapstructure:"message_type"`
 	SubType     string    `json:"sub_type" mapstructure:"sub_type"`
-	MessageID   int32     `json:"message_id" mapstructure:"message_id"`
-	GroupID     int64     `json:"group_id,omitempty" mapstructure:"group_id,omitempty"`
-	UserID      int64     `json:"user_id" mapstructure:"user_id"`
-	TargetID    int64     `json:"target_id,omitempty" mapstructure:"target_id,omitempty"`
+	MessageID   string    `json:"message_id" mapstructure:"message_id"`
+	GroupID     string    `json:"group_id,omitempty" mapstructure:"group_id,omitempty"`
+	UserID      string    `json:"user_id" mapstructure:"user_id"`
+	TargetID    string    `json:"target_id,omitempty" mapstructure:"target_id,omitempty"`
 	Anonymous   Anonymous `json:"anonymous,omitempty" mapstructure:"anonymous,omitempty"`
 	Message     any       `json:"message" mapstructure:"message"`
 	Font        int32     `json:"font" mapstructure:"font"`
@@ -320,13 +320,13 @@ func (m *Message) EventType() EventType {
 }
 
 type Anonymous struct {
-	ID   int64  `json:"id" mapstructure:"id"`
+	ID   string `json:"id" mapstructure:"id"`
 	Name string `json:"name" mapstructure:"name"`
 	Flag string `json:"flag,omitempty" mapstructure:"flag,omitempty"`
 }
 
 type Sender struct {
-	UserID   int64  `json:"user_id" mapstructure:"user_id"`
+	UserID   string `json:"user_id" mapstructure:"user_id"`
 	Nickname string `json:"nickname,omitempty" mapstructure:"nickname,omitempty"`
 	Card     string `json:"card,omitempty" mapstructure:"card,omitempty"`
 	Sex      string `json:"sex,omitempty" mapstructure:"sex,omitempty"`
@@ -366,10 +366,10 @@ func (h *Heartbeat) EventType() EventType {
 type GroupRecall struct {
 	Event      `mapstructure:",squash"`
 	NoticeType string `json:"notice_type" mapstructure:"notice_type"`
-	GroupID    int64  `json:"group_id" mapstructure:"group_id"`
-	UserID     int64  `json:"user_id" mapstructure:"user_id"`
-	OperatorID int64  `json:"operator_id" mapstructure:"operator_id"`
-	MessageID  int64  `json:"message_id" mapstructure:"message_id"`
+	GroupID    string `json:"group_id" mapstructure:"group_id"`
+	UserID     string `json:"user_id" mapstructure:"user_id"`
+	OperatorID string `json:"operator_id" mapstructure:"operator_id"`
+	MessageID  string `json:"message_id" mapstructure:"message_id"`
 }
 
 func (g *GroupRecall) EventType() EventType {
@@ -379,8 +379,8 @@ func (g *GroupRecall) EventType() EventType {
 type FriendRecall struct {
 	Event      `mapstructure:",squash"`
 	NoticeType string `json:"notice_type" mapstructure:"notice_type"`
-	UserID     int64  `json:"user_id" mapstructure:"user_id"`
-	MessageID  int64  `json:"message_id" mapstructure:"message_id"`
+	UserID     string `json:"user_id" mapstructure:"user_id"`
+	MessageID  string `json:"message_id" mapstructure:"message_id"`
 }
 
 func (g *FriendRecall) EventType() EventType {

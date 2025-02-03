@@ -52,7 +52,7 @@ func ParseMessageID(messageID networkid.MessageID) (string, string, error) {
 	}
 }
 func GetPeerID(message *onebot.Message) string {
-	var peerID int64
+	var peerID string
 
 	if message.EventType() == onebot.MessagePrivate {
 		peerID = message.Sender.UserID
@@ -63,5 +63,5 @@ func GetPeerID(message *onebot.Message) string {
 		peerID = message.GroupID
 	}
 
-	return fmt.Sprint(peerID)
+	return peerID
 }

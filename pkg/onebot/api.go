@@ -3,8 +3,8 @@ package onebot
 import (
 	"encoding/base64"
 	"fmt"
-	"strconv"
 	"strings"
+	"time"
 
 	"github.com/duo/matrix-pylon/pkg/util"
 	"github.com/mitchellh/mapstructure"
@@ -22,12 +22,7 @@ func (c *Client) GetLoginInfo() (*UserInfo, error) {
 	return info, err
 }
 
-func (c *Client) GetUserInfo(id string) (*UserInfo, error) {
-	userID, err := strconv.ParseInt(id, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *Client) GetUserInfo(userID string) (*UserInfo, error) {
 	resp, err := c.request(NewGetUserInfoRequest(userID))
 	if err != nil {
 		return nil, err
@@ -39,12 +34,7 @@ func (c *Client) GetUserInfo(id string) (*UserInfo, error) {
 	return info, err
 }
 
-func (c *Client) GetGroupInfo(id string) (*GroupInfo, error) {
-	groupID, err := strconv.ParseInt(id, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *Client) GetGroupInfo(groupID string) (*GroupInfo, error) {
 	resp, err := c.request(NewGetGroupInfoRequest(groupID))
 	if err != nil {
 		return nil, err
@@ -80,12 +70,7 @@ func (c *Client) GetGroupList() ([]*GroupInfo, error) {
 	return groups, err
 }
 
-func (c *Client) GetGroupMemberList(id string) ([]*MemberInfo, error) {
-	groupID, err := strconv.ParseInt(id, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *Client) GetGroupMemberList(groupID string) ([]*MemberInfo, error) {
 	resp, err := c.request(NewGetGroupMemberListRequest(groupID))
 	if err != nil {
 		return nil, err
@@ -97,16 +82,7 @@ func (c *Client) GetGroupMemberList(id string) ([]*MemberInfo, error) {
 	return members, err
 }
 
-func (c *Client) GetGroupMemberInfo(gid string, uid string) (*MemberInfo, error) {
-	groupID, err := strconv.ParseInt(gid, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-	userID, err := strconv.ParseInt(uid, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *Client) GetGroupMemberInfo(groupID string, userID string) (*MemberInfo, error) {
 	resp, err := c.request(NewGetGroupMemberInfoRequest(groupID, userID))
 	if err != nil {
 		return nil, err
@@ -118,7 +94,7 @@ func (c *Client) GetGroupMemberInfo(gid string, uid string) (*MemberInfo, error)
 	return member, err
 }
 
-func (c *Client) SendPrivateMessage(userID int64, segments []ISegment) (*SendMessageResponse, error) {
+func (c *Client) SendPrivateMessage(userID string, segments []ISegment) (*SendMessageResponse, error) {
 	resp, err := c.request(NewPrivateMsgRequest(userID, segments))
 	if err != nil {
 		return nil, err
@@ -130,7 +106,7 @@ func (c *Client) SendPrivateMessage(userID int64, segments []ISegment) (*SendMes
 	return msgResp, err
 }
 
-func (c *Client) SendGroupMessage(groupID int64, segments []ISegment) (*SendMessageResponse, error) {
+func (c *Client) SendGroupMessage(groupID string, segments []ISegment) (*SendMessageResponse, error) {
 	resp, err := c.request(NewGroupMsgRequest(groupID, segments))
 	if err != nil {
 		return nil, err
@@ -142,8 +118,8 @@ func (c *Client) SendGroupMessage(groupID int64, segments []ISegment) (*SendMess
 	return msgResp, err
 }
 
-func (c *Client) DeleteMessage(id int32) error {
-	_, err := c.request(NewDeleteMsgRequest(id))
+func (c *Client) DeleteMessage(messageID string) error {
+	_, err := c.request(NewDeleteMsgRequest(messageID))
 
 	return err
 }
@@ -160,7 +136,6 @@ func (c *Client) DownloadMedia(seg ISegment) (string, []byte, error) {
 		request = NewGetImageRequest(v.File())
 		url = v.URL()
 	case *VideoSegment:
-		// TODO: If the download is an image, wait and try again?
 		request = NewGetFileRequest(v.File())
 		url = v.URL()
 	case *FileSegment:
@@ -175,6 +150,9 @@ func (c *Client) DownloadMedia(seg ISegment) (string, []byte, error) {
 		(seg.SegmentType() == Image && seg.(*ImageSegment).IsSticker()) {
 		if strings.HasPrefix(url, "http") {
 			return util.Download(url)
+		} else {
+			// The video has not been processed yet
+			time.Sleep(3 * time.Second)
 		}
 	}
 
