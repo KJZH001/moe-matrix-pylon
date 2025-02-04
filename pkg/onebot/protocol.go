@@ -154,6 +154,7 @@ func NewGetImageRequest(fileID string) *Request {
 		Action: string(GetImage),
 		Params: map[string]interface{}{
 			"file_id": fileID,
+			"file":    fileID,
 		},
 	}
 }
@@ -163,6 +164,7 @@ func NewGetFileRequest(fileID string) *Request {
 		Action: string(GetFile),
 		Params: map[string]interface{}{
 			"file_id": fileID,
+			"file":    fileID,
 		},
 	}
 }
@@ -512,7 +514,7 @@ func (s *MarketFaceSegment) URL() string {
 }
 
 func (s *MarketFaceSegment) File() string {
-	return s.Data["file"].(string)
+	return s.Data["emoji_id"].(string)
 }
 
 func (s *ImageSegment) File() string {

@@ -46,8 +46,6 @@ func (mc *MessageConverter) OnebotToMatrix(
 			fmt.Fprint(&contentBuilder, v.Content())
 		case *onebot.FaceSegment:
 			fmt.Fprintf(&contentBuilder, "/[Face%s]", v.ID())
-		case *onebot.MarketFaceSegment:
-			fmt.Fprint(&contentBuilder, v.Content())
 		case *onebot.AtSegment:
 			target := v.Target()
 			if target == "all" {
@@ -56,6 +54,9 @@ func (mc *MessageConverter) OnebotToMatrix(
 			fmt.Fprintf(&contentBuilder, "@%s", target)
 			mentions = append(mentions, target)
 		case *onebot.ImageSegment:
+			mediaParts = append(mediaParts, mc.convertMediaMessage(ctx, v))
+			fmt.Fprint(&contentBuilder, "[Image]")
+		case *onebot.MarketFaceSegment:
 			mediaParts = append(mediaParts, mc.convertMediaMessage(ctx, v))
 			fmt.Fprint(&contentBuilder, "[Image]")
 		case *onebot.RecordSegment:

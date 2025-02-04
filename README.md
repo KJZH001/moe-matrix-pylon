@@ -17,6 +17,12 @@ Agents:
 "enableLocalFile2Url": true,
 ```
 
+[LLOneBot](https://github.com/LLOneBot/LLOneBot) (tested: v4.7.5)
+```
+新消息上报格式: 消息段
+使用Base64编码获取文件: 开启
+```
+
 Some quick links:
 
 - [Bridge setup](https://docs.mau.fi/bridges/go/setup.html)
