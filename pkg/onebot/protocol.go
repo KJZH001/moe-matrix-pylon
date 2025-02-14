@@ -159,6 +159,17 @@ func NewGetImageRequest(fileID string) *Request {
 	}
 }
 
+func NewGetMarketFaceRequest(fileID string) *Request {
+	return &Request{
+		Action: string(GetImage),
+		Params: map[string]interface{}{
+			"file_id":  fileID,
+			"file":     fileID,
+			"emoji_id": fileID,
+		},
+	}
+}
+
 func NewGetFileRequest(fileID string) *Request {
 	return &Request{
 		Action: string(GetFile),
@@ -224,11 +235,13 @@ type UserInfo struct {
 	ID       string `json:"user_id" mapstructure:"user_id"`
 	Nickname string `json:"nickname,omitempty" mapstructure:"nickname,omitempty"`
 	Remark   string `json:"remark,omitempty" mapstructure:"remark,omitempty"`
+	Avatar   string `json:"avatar,omitempty" mapstructure:"avatar,omitempty"`
 }
 
 type GroupInfo struct {
-	ID   string `json:"group_id" mapstructure:"group_id"`
-	Name string `json:"group_name,omitempty" mapstructure:"group_name,omitempty"`
+	ID     string `json:"group_id" mapstructure:"group_id"`
+	Name   string `json:"group_name,omitempty" mapstructure:"group_name,omitempty"`
+	Avatar string `json:"avatar,omitempty" mapstructure:"avatar,omitempty"`
 }
 
 type MemberInfo struct {
@@ -237,6 +250,7 @@ type MemberInfo struct {
 	Nickname string `json:"nickname,omitempty" mapstructure:"nickname,omitempty"`
 	Card     string `json:"card,omitempty" mapstructure:"card,omitempty"`
 	Role     string `json:"role,omitempty" mapstructure:"role,omitempty"`
+	Avatar   string `json:"avatar,omitempty" mapstructure:"avatar,omitempty"`
 }
 
 type FileInfo struct {
@@ -244,7 +258,7 @@ type FileInfo struct {
 	Name     string `json:"name,omitempty" mapstructure:"name,omitempty"`
 	File     string `json:"file,omitempty" mapstructure:"file,omitempty"`
 	FileName string `json:"file_name,omitempty" mapstructure:"file_name,omitempty"`
-	URL      string `json:"url" mapstructure:"url"`
+	URL      string `json:"url,omitempty" mapstructure:"url,omitempty"`
 	Base64   string `json:"base64,omitempty" mapstructure:"base64,omitempty"`
 }
 
@@ -689,6 +703,20 @@ func NewReply(id string) *ReplySegment {
 			Type: string(Reply),
 			Data: map[string]interface{}{
 				"id": id,
+			},
+		},
+	}
+}
+
+func NewLocation(lat, lon float64, title, content string) *LocationSegment {
+	return &LocationSegment{
+		Segment{
+			Type: string(Location),
+			Data: map[string]interface{}{
+				"lat":     lat,
+				"lon":     lon,
+				"title":   title,
+				"content": content,
 			},
 		},
 	}

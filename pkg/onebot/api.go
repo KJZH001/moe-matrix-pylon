@@ -133,7 +133,7 @@ func (c *Client) DownloadMedia(seg ISegment) (string, []byte, error) {
 		request = NewGetImageRequest(v.File())
 		url = v.URL()
 	case *MarketFaceSegment:
-		request = NewGetImageRequest(v.File())
+		request = NewGetMarketFaceRequest(v.File())
 		url = v.URL()
 	case *VideoSegment:
 		request = NewGetFileRequest(v.File())

@@ -13,12 +13,21 @@ import (
 	"github.com/rs/zerolog"
 )
 
+type AgentType int
+
+const (
+	AgentNapCat AgentType = iota
+	AgentLLOneBot
+	AgentWeChat
+)
+
 type Client struct {
 	log zerolog.Logger
 
-	id      string
-	token   string
-	service *Service
+	id        string
+	token     string
+	agentType AgentType
+	service   *Service
 
 	eventHandler func(IEvent)
 
@@ -129,6 +138,10 @@ func (c *Client) GetToken() string {
 
 func (c *Client) IsLoggedIn() bool {
 	return c.isLoggedIn.Load()
+}
+
+func (c *Client) GetAgentType() AgentType {
+	return c.agentType
 }
 
 func (c *Client) startChecker(interval uint32) {

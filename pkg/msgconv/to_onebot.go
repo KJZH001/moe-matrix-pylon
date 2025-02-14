@@ -123,8 +123,10 @@ func (mc *MessageConverter) constructMediaMessage(_ context.Context, content *ev
 	return []onebot.ISegment{}
 }
 
-func (mc *MessageConverter) constructLocationMessage(_ context.Context, name string, lat, lng float64) []onebot.ISegment {
-	locationJson := fmt.Sprintf(`
+func (mc *MessageConverter) constructLocationMessage(ctx context.Context, name string, lat, lng float64) []onebot.ISegment {
+	agentType := getClient(ctx).GetAgentType()
+	if agentType == onebot.AgentNapCat || agentType == onebot.AgentLLOneBot {
+		locationJson := fmt.Sprintf(`
 		{
 			"app": "com.tencent.map",
 			"desc": "地图",
@@ -150,7 +152,10 @@ func (mc *MessageConverter) constructLocationMessage(_ context.Context, name str
 		}
 		`, name, name, name, lat, lng)
 
-	return []onebot.ISegment{onebot.NewJSON(locationJson)}
+		return []onebot.ISegment{onebot.NewJSON(locationJson)}
+	}
+
+	return []onebot.ISegment{onebot.NewLocation(lat, lng, name, name)}
 }
 
 func parseGeoURI(uri string) (lat, lng float64, err error) {

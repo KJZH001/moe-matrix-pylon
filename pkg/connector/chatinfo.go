@@ -114,9 +114,14 @@ func (pc *PylonClient) getGroupChatInfo(_ context.Context, portal *bridgev2.Port
 		return nil, fmt.Errorf("failed to fetch members %s: %w", peerID, err)
 	}
 
+	avatarURL := groupInfo.Avatar
+	if pc.client.GetAgentType() == onebot.AgentNapCat || pc.client.GetAgentType() == onebot.AgentLLOneBot {
+		avatarURL = util.GetGroupAvatarURL(groupInfo.ID)
+	}
+
 	wrapped := &bridgev2.ChatInfo{
 		Name:   ptr.Ptr(groupInfo.Name),
-		Avatar: wrapAvatar(util.GetGroupAvatarURL(groupInfo.ID)),
+		Avatar: wrapAvatar(avatarURL),
 		Members: &bridgev2.ChatMemberList{
 			IsFull:           true,
 			TotalMemberCount: len(membersInfo),
@@ -157,6 +162,11 @@ func (pc *PylonClient) getGroupChatInfo(_ context.Context, portal *bridgev2.Port
 }
 
 func (pc *PylonClient) contactToUserInfo(contact *onebot.UserInfo) *bridgev2.UserInfo {
+	avatarURL := contact.Avatar
+	if pc.client.GetAgentType() == onebot.AgentNapCat || pc.client.GetAgentType() == onebot.AgentLLOneBot {
+		avatarURL = util.GetUserAvatarURL(contact.ID)
+	}
+
 	return &bridgev2.UserInfo{
 		IsBot:        nil,
 		Identifiers:  []string{},
@@ -166,7 +176,7 @@ func (pc *PylonClient) contactToUserInfo(contact *onebot.UserInfo) *bridgev2.Use
 			Name:  contact.Nickname,
 			ID:    contact.ID,
 		})),
-		Avatar: wrapAvatar(util.GetUserAvatarURL(contact.ID)),
+		Avatar: wrapAvatar(avatarURL),
 	}
 }
 

@@ -96,6 +96,15 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	agent := r.Header.Get("User-Agent")
+	if strings.HasPrefix(agent, "LLOneBot") {
+		client.agentType = AgentLLOneBot
+	} else if strings.HasPrefix(agent, "WeChat") {
+		client.agentType = AgentWeChat
+	} else {
+		client.agentType = AgentNapCat
+	}
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		s.log.Warn().Err(err).Msg("Failed to upgrade websocket request")

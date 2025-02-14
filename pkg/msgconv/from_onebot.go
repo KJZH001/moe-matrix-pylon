@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html"
 	"math"
+	"path/filepath"
 	"strings"
 
 	"github.com/duo/matrix-pylon/pkg/ids"
@@ -74,6 +75,8 @@ func (mc *MessageConverter) OnebotToMatrix(
 			}
 		case *onebot.ForwardSegment:
 			fmt.Fprint(&contentBuilder, "[Chat History]")
+		case *onebot.ShareSegment:
+			part = mc.convertShareMessage(v.Title(), v.Content(), v.URL())
 		case *onebot.JSONSegment:
 			part = mc.convertJSONMessage(ctx, v)
 		default:
@@ -144,11 +147,11 @@ func (mc *MessageConverter) convertJSONMessage(_ context.Context, seg *onebot.JS
 		if url := gjson.Get(content, "meta.*.qqdocurl").String(); len(url) > 0 {
 			desc := gjson.Get(content, "meta.*.desc").String()
 			prompt := gjson.Get(content, "prompt").String()
-			return mc.convertArticleMessage(prompt, desc, url)
+			return mc.convertShareMessage(prompt, desc, url)
 		} else if url := gjson.Get(content, "meta.*.jumpUrl").String(); len(url) > 0 {
 			desc := gjson.Get(content, "meta.*.desc").String()
 			prompt := gjson.Get(content, "prompt").String()
-			return mc.convertArticleMessage(prompt, desc, url)
+			return mc.convertShareMessage(prompt, desc, url)
 		}
 	}
 
@@ -189,7 +192,7 @@ func (mc *MessageConverter) convertLocationMessage(name, address string, latitud
 	}
 }
 
-func (mc *MessageConverter) convertArticleMessage(title, desc, url string) *bridgev2.ConvertedMessagePart {
+func (mc *MessageConverter) convertShareMessage(title, desc, url string) *bridgev2.ConvertedMessagePart {
 	body := fmt.Sprintf("%s\n\n%s\n\n%s", title, desc, url)
 	rendered := format.RenderMarkdown(
 		fmt.Sprintf("**%s**\n%s\n\n[%s](%s)", title, desc, url, url),
@@ -219,6 +222,9 @@ func (mc *MessageConverter) reploadAttachment(ctx context.Context, seg onebot.IS
 	}
 
 	mime := mimetype.Detect(data)
+	if filepath.Ext(fileName) == "" {
+		fileName = fileName + mime.Extension()
+	}
 	content.Info.Size = len(data)
 	content.FileName = fileName
 
