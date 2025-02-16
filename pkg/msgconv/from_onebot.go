@@ -41,7 +41,8 @@ func (mc *MessageConverter) OnebotToMatrix(
 
 	var contentBuilder strings.Builder
 
-	for _, s := range msg.Message.([]onebot.ISegment) {
+	segments := msg.Message.([]onebot.ISegment)
+	for _, s := range segments {
 		switch v := s.(type) {
 		case *onebot.TextSegment:
 			fmt.Fprint(&contentBuilder, v.Content())
@@ -85,7 +86,7 @@ func (mc *MessageConverter) OnebotToMatrix(
 	}
 
 	if part == nil {
-		if len(mediaParts) > 1 {
+		if len(segments) > 1 && len(mediaParts) >= 1 { // mixed image and text
 			var imagesMarkdown strings.Builder
 			for _, part := range mediaParts {
 				fmt.Fprintf(&imagesMarkdown, "![%s](%s)\n", part.Content.FileName, part.Content.URL)
