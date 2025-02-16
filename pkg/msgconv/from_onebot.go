@@ -45,9 +45,9 @@ func (mc *MessageConverter) OnebotToMatrix(
 	for _, s := range segments {
 		switch v := s.(type) {
 		case *onebot.TextSegment:
-			fmt.Fprint(&contentBuilder, v.Content())
+			fmt.Fprint(&contentBuilder, convertOnebotEmoji(client, v.Content()))
 		case *onebot.FaceSegment:
-			fmt.Fprintf(&contentBuilder, "/[Face%s]", v.ID())
+			fmt.Fprint(&contentBuilder, convertOnebotFace(client, v.ID()))
 		case *onebot.AtSegment:
 			target := v.Target()
 			if target == "all" {

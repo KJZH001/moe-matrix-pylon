@@ -173,5 +173,5 @@ func (c *Client) DownloadMedia(seg ISegment) (string, []byte, error) {
 		return util.Download(url)
 	}
 
-	return "", nil, fmt.Errorf("Failed to download media: %+v", seg)
+	return "", nil, fmt.Errorf("failed to download media: %+v", seg)
 }
