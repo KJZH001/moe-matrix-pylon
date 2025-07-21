@@ -199,7 +199,7 @@ func (c *Client) request(req *Request) (any, error) {
 	select {
 	case resp := <-respChan:
 		if resp.Status != "ok" {
-			return resp, fmt.Errorf("%s Onebot response retcode: %d", resp.Status, resp.Retcode)
+			return resp, fmt.Errorf("%s Onebot错误代码: %d", resp.Status, resp.Retcode)
 		} else {
 			return resp.Data, nil
 		}
@@ -213,7 +213,7 @@ func (c *Client) _request(req *Request) error {
 	defer c.connLock.Unlock()
 
 	if c.conn == nil {
-		return errors.New("websocket not connected")
+		return errors.New("websocket未连接")
 	}
 
 	return c.conn.WriteJSON(req)
