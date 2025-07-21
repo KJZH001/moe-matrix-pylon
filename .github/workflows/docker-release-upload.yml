@@ -1,0 +1,31 @@
+name: Docker image to Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  docker-release-upload:
+    name: Build Docker image and upload to Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t matrix-pylon:release .
+
+      - name: Save Docker image to tar
+        run: |
+          docker save matrix-pylon:release -o matrix-pylon-docker.tar
+
+      - name: Upload Docker image tar to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: matrix-pylon-docker.tar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
