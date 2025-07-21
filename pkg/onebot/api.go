@@ -143,7 +143,7 @@ func (c *Client) DownloadMedia(seg ISegment) (string, []byte, error) {
 	case *RecordSegment:
 		request = NewGetRecordRequest(v.File())
 	default:
-		return "", nil, fmt.Errorf("unsupported media type %+v", v.SegmentType())
+		return "", nil, fmt.Errorf("不支持的媒体资源类型 %+v", v.SegmentType())
 	}
 
 	if seg.SegmentType() == MarketFace || seg.SegmentType() == Video ||
@@ -173,5 +173,5 @@ func (c *Client) DownloadMedia(seg ISegment) (string, []byte, error) {
 		return util.Download(url)
 	}
 
-	return "", nil, fmt.Errorf("failed to download media: %+v", seg)
+	return "", nil, fmt.Errorf("下载媒体资源失败: %+v", seg)
 }
