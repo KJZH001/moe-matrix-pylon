@@ -7,6 +7,7 @@ import (
 	"math"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/duo/matrix-pylon/pkg/ids"
 	"github.com/duo/matrix-pylon/pkg/onebot"
@@ -223,9 +224,17 @@ func (mc *MessageConverter) reploadAttachment(ctx context.Context, seg onebot.IS
 	}
 
 	mime := mimetype.Detect(data)
+	ext := mime.Extension()
 	if filepath.Ext(fileName) == "" {
-		fileName = fileName + mime.Extension()
+		fileName = fileName + ext
 	}
+
+	// 自定义文件名：matrix-年月日-时分秒-房间id.扩展名
+	roomID := getPortal(ctx).MXID
+	timestamp := time.Now().Format("20060102-150405")
+	customFileName := fmt.Sprintf("matrix-%s-%s%s", timestamp, roomID, ext)
+	fileName = customFileName
+
 	content.Info.Size = len(data)
 	content.FileName = fileName
 
