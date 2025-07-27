@@ -1,0 +1,31 @@
+name: Docker image to artifact
+
+on:
+  workflow_dispatch:
+
+jobs:
+  docker-artifact-upload:
+    name: Build Docker image and upload to Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t moeworld/moe-matrix-pylon:latest .
+
+      - name: Save Docker image to tar
+        run: |
+          docker save moeworld/moe-matrix-pylon:latest -o moe-matrix-pylon-docker.tar
+
+      - name: Upload Docker image tar to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: moe-matrix-pylon-docker-image
+          path: moe-matrix-pylon-docker.tar
+          retention-days: 30
