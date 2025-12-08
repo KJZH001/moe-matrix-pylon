@@ -66,6 +66,32 @@ func (pc *PylonClient) handleOnebotEvent(evt onebot.IEvent) {
 			pc:     pc,
 			isFake: true,
 		})
+	case onebot.NoticeNotifyPoke:
+		poke := evt.(*onebot.Poke)
+		// 生成一个假的 message_id，使用时间戳和 user_id
+		fakeMessageID := fmt.Sprintf("poke-%d-%s", poke.Time, poke.UserID)
+		
+		messageType := "private"
+		groupID := ""
+		if poke.GroupID != "" {
+			messageType = "group"
+			groupID = poke.GroupID
+		}
+		
+		pc.main.Bridge.QueueRemoteEvent(pc.userLogin, &OnebotMessageEvent{
+			message: &onebot.Message{
+				MessageType: messageType,
+				MessageID:   fakeMessageID,
+				GroupID:     groupID,
+				Sender:      onebot.Sender{UserID: poke.UserID},
+				Event:       onebot.Event{Time: poke.Time, SelfID: poke.SelfID},
+				Message: []onebot.ISegment{
+					onebot.NewText("[戳一戳]"),
+				},
+			},
+			pc:     pc,
+			isFake: true,
+		})
 	}
 }
 

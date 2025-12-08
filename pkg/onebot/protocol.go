@@ -403,6 +403,18 @@ func (g *FriendRecall) EventType() EventType {
 	return NoticeFriendRecall
 }
 
+type Poke struct {
+	Event      `mapstructure:",squash"`
+	NoticeType string `json:"notice_type" mapstructure:"notice_type"`
+	UserID     string `json:"user_id" mapstructure:"user_id"`
+	TargetID   string `json:"target_id" mapstructure:"target_id"`
+	GroupID    string `json:"group_id,omitempty" mapstructure:"group_id,omitempty"`
+}
+
+func (p *Poke) EventType() EventType {
+	return NoticeNotifyPoke
+}
+
 type SegmentType string
 
 const (
@@ -780,6 +792,10 @@ func unmarshalNotice(m map[string]interface{}) (Payload, error) {
 		return &event, err
 	case "friend_recall":
 		var event FriendRecall
+		err := mapstructure.WeakDecode(m, &event)
+		return &event, err
+	case "poke":
+		var event Poke
 		err := mapstructure.WeakDecode(m, &event)
 		return &event, err
 	}
