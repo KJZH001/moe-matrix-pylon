@@ -406,6 +406,7 @@ func (g *FriendRecall) EventType() EventType {
 type Poke struct {
 	Event      `mapstructure:",squash"`
 	NoticeType string `json:"notice_type" mapstructure:"notice_type"`
+	SubType    string `json:"sub_type,omitempty" mapstructure:"sub_type,omitempty"`
 	UserID     string `json:"user_id" mapstructure:"user_id"`
 	TargetID   string `json:"target_id" mapstructure:"target_id"`
 	GroupID    string `json:"group_id,omitempty" mapstructure:"group_id,omitempty"`
@@ -798,6 +799,12 @@ func unmarshalNotice(m map[string]interface{}) (Payload, error) {
 		var event Poke
 		err := mapstructure.WeakDecode(m, &event)
 		return &event, err
+	case "notify":
+		if m["sub_type"] == "poke" {
+			var event Poke
+			err := mapstructure.WeakDecode(m, &event)
+			return &event, err
+		}
 	}
 
 	return unmarshalEvent(m)
